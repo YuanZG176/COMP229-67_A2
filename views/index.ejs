@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>mongodb的增删改查的演示</h1>
+    <div>
+      <div>用户名:<input id="username"/></div>
+      <div>密码:<input type="password" id="password"/></div>
+      <div>年龄:<input type="number" id="age"/></div>
+      <div><button id="register">注册</button></div>
+    </div>
+    <hr>
+    <div>
+      <button id="update">更新</button>
+      <button id="delete">删除</button>
+    </div>
+    <hr>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <td>id</td>
+          <td>用户名</td>
+          <td>年龄</td>
+        </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </table>
+    <script>
+      var register = document.querySelector("#register")
+      var update = document.querySelector("#update")
+      var deletebutton = document.querySelector("#delete")
+      var username = document.querySelector("#username")
+      var password = document.querySelector("#password")
+      var age = document.querySelector("#age")
+
+      register.onclick = ()=>{
+        console.log(username.value,password.value,age.value)
+        fetch("/api/user",{
+          method:"POST",
+          body:JSON.stringify({
+            username:username.value,
+            password:password.value,
+            age:age.value
+          }),
+          headers:{
+            "Content-Type":"application/json"
+          }
+        }).then(res=>res.json()).then(res=>{
+          console.log(res)
+        })
+      }
+
+      update.onclick=  ()=>{
+        fetch("/api/user/62579fd78f935f98f7359029",{
+          method:"PUT",
+          body:JSON.stringify({
+            username:"修改的名字",
+            password:"修改的密码",
+            age:1 
+          }),
+          headers:{
+            "Content-Type":"application/json"
+          }
+        }).then(res=>res.json()).then(res=>{
+          console.log(res)
+        })
+      }
+
+      deletebutton.onclick= ()=>{
+        fetch("/api/user/62579fd78f935f98f7359029",{
+          method:"DELETE"
+        }).then(res=>res.json()).then(res=>{
+          console.log(res)
+        })
+      }
+      
+
+      //获取列表
+
+      fetch("/api/user?page=1&limit=10").then(res=>res.json()).then(res=>{
+        console.log(res)
+        var tbody = document.querySelector("tbody")
+        tbody.innerHTML = res.map(item=>`
+          <tr>
+            <td>${item._id}</td>  
+            <td>${item.username}</td>  
+            <td>${item.age}</td>  
+          </tr>
+        `).join("")
+      })
+    </script>
+  </body>
+</html>
